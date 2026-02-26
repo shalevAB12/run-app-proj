@@ -1,6 +1,9 @@
 package shaleva.run_app_proj.ui;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
@@ -18,22 +21,35 @@ public class UserView extends VerticalLayout {
     private TextField txfUn;
     private TextField txfPw;
     private Button btnInsert;
+    private Grid<User> usersGrid;
+
     public UserView(UserService userService) {
         this.userService = userService;
 
         add(new H1("UserView"));
         HorizontalLayout layout = new HorizontalLayout();
-        layout.add(txfUn = new TextField("username: "));
-        layout.add(txfPw = new TextField("password: "));
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.BASELINE);
+        this.usersGrid = new Grid<>(User.class);
+        this.usersGrid.setItems(userService.getAllUsers());
+        this.usersGrid.setColumns(new String[] { "username", "password" });
+        this.usersGrid.getColumns().forEach(col -> col.setTextAlign(ColumnTextAlign.CENTER));
+        this.usersGrid.setAllRowsVisible(true);
+
+        layout.add(txfUn = new TextField("username"));
+        layout.add(txfPw = new TextField("password"));
         layout.add(btnInsert = new Button("Insert user to DB"));
+        layout.add(new Component[] { this.usersGrid });
+
         btnInsert.addClickListener(clickEvent -> insertUserToDB());
         add(layout);
     }
 
+    // user insertion
     private void insertUserToDB() {
         String un = txfUn.getValue();
         String pw = txfPw.getValue();
-        System.out.println("***********************************11");
+
         // validation check
         if (un == null || pw == null || un.length() < 6) {
             return;
@@ -41,6 +57,9 @@ public class UserView extends VerticalLayout {
 
         try {
             userService.insertUser(new User(un, pw));
+            this.usersGrid.setItems(this.userService.getAllUsers());
+
+            // insertion has succeed
             Notification.show("User inserted OK", 3000, Position.MIDDLE);
         } catch (Exception e) {
             e.printStackTrace();

@@ -7,5 +7,5 @@ import shaleva.run_app_proj.datamodels.User;
 
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
-    
+    boolean existsByUsernameAndPassword(String username, String password);
 } 
