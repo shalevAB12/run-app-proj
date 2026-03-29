@@ -21,6 +21,7 @@ public class UserView extends VerticalLayout {
     private TextField txfUn;
     private TextField txfPw;
     private Button btnInsert;
+    private Button btnRefresh;
     private Grid<User> usersGrid;
 
     public UserView(UserService userService) {
@@ -35,13 +36,16 @@ public class UserView extends VerticalLayout {
         this.usersGrid.setColumns(new String[] { "username", "password" });
         this.usersGrid.getColumns().forEach(col -> col.setTextAlign(ColumnTextAlign.CENTER));
         this.usersGrid.setAllRowsVisible(true);
+        this.usersGrid.addItemDoubleClickListener(clickEvent -> deleteUserFromDB(clickEvent.getItem()));
 
         layout.add(txfUn = new TextField("username"));
         layout.add(txfPw = new TextField("password"));
         layout.add(btnInsert = new Button("Insert user to DB"));
+        layout.add(btnRefresh = new Button("Refresh"));
         layout.add(new Component[] { this.usersGrid });
 
         btnInsert.addClickListener(clickEvent -> insertUserToDB());
+        btnRefresh.addClickListener(clickEvent -> this.usersGrid.setItems(userService.getAllUsers()));
         add(layout);
     }
 
@@ -51,7 +55,7 @@ public class UserView extends VerticalLayout {
         String pw = txfPw.getValue();
 
         // validation check
-        if (un == null || pw == null || un.length() < 6) {
+        if (un == null || pw == null) {
             return;
         }
 
@@ -66,5 +70,13 @@ public class UserView extends VerticalLayout {
             // update user by notification for this error
             Notification.show("User NOT inserted", 3000, Position.MIDDLE);
         }
+
+        txfUn.setValue("");
+        txfPw.setValue("");
+    }
+
+    private void deleteUserFromDB(User user) {
+        userService.deleteUser(user);
+        usersGrid.setItems(userService.getAllUsers());
     }
 }

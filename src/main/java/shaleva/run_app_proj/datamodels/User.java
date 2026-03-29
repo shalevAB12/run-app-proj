@@ -1,9 +1,11 @@
 package shaleva.run_app_proj.datamodels;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Users")
 public class User {
+    @Id
     private String username;
     private String password;
 

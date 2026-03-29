@@ -23,4 +23,12 @@ public class UserService {
         return (ArrayList) this.userRepo.findAll();
     }
 
+    public void deleteUser(User user) {
+        userRepo.delete(user);
+    }
+
+    public User getUserFromDB(User user) {
+        User queryResult = userRepo.findByUsernameAndPassword(user.getUsername(), user.getPassword());
+        return queryResult;
+    }
 }
