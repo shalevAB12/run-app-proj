@@ -1,5 +1,7 @@
 package shaleva.run_app_proj.ui;
 
+import java.util.List;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -12,7 +14,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
+import shaleva.run_app_proj.datamodels.RouteRequest;
 import shaleva.run_app_proj.datamodels.User;
+import shaleva.run_app_proj.datamodels.Waypoint;
+import shaleva.run_app_proj.services.RouteService;
 import shaleva.run_app_proj.services.UserService;
 
 @Route("/")
@@ -24,8 +29,11 @@ public class UserView extends VerticalLayout {
     private Button btnRefresh;
     private Grid<User> usersGrid;
 
-    public UserView(UserService userService) {
+    private RouteService routeService;
+
+    public UserView(UserService userService, RouteService routeService) {
         this.userService = userService;
+        this.routeService = routeService;
 
         add(new H1("UserView"));
         HorizontalLayout layout = new HorizontalLayout();
@@ -47,6 +55,10 @@ public class UserView extends VerticalLayout {
         btnInsert.addClickListener(clickEvent -> insertUserToDB());
         btnRefresh.addClickListener(clickEvent -> this.usersGrid.setItems(userService.getAllUsers()));
         add(layout);
+
+        //routeService.printCandidates(new RouteRequest(31.937128555898866, 34.86563970309029, 3000));
+        //List<Waypoint> result = this.routeService.calculateOptimizedRoute(new RouteRequest(31.937128555898866, 34.86563970309029, 3000));
+        //this.routeService.printRoute(result);
     }
 
     // user insertion
