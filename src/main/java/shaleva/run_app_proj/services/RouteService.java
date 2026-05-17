@@ -18,13 +18,16 @@ import java.io.IOException;
 
 // DTOs
 import shaleva.run_app_proj.datamodels.Candidate;
+import shaleva.run_app_proj.datamodels.DirectionsResponse;
 import shaleva.run_app_proj.datamodels.DistanceMatrixResponse;
 import shaleva.run_app_proj.datamodels.DistanceMatrixResponse.Row;
 import shaleva.run_app_proj.datamodels.LocationCategory;
+import shaleva.run_app_proj.datamodels.OptimizedRoute;
 import shaleva.run_app_proj.datamodels.PlacesResponse;
 import shaleva.run_app_proj.datamodels.RoadsResponse; // הייבוא החדש
-import shaleva.run_app_proj.datamodels.RouteRequest;
+import shaleva.run_app_proj.datamodels.RouteRequestObject;
 import shaleva.run_app_proj.datamodels.Waypoint;
+import shaleva.run_app_proj.utilities.GoogleDirectionsClient;
 import shaleva.run_app_proj.utilities.GoogleDistanceMatrixClient;
 // Clients
 import shaleva.run_app_proj.utilities.GooglePlacesClient;
@@ -41,6 +44,9 @@ public class RouteService {
 
     @Autowired
     private GoogleDistanceMatrixClient distanceMatrixClient;
+
+    @Autowired
+    private GoogleDirectionsClient directionsClient;
 
     @Autowired
     private DPSOAlgorithmService dpsoAlgorithmService;
@@ -69,7 +75,10 @@ public class RouteService {
     private int countRoad = 0;
     private int countRaw = 0;
 
-    public List<Waypoint> calculateOptimizedRoute(RouteRequest request) {
+    public OptimizedRoute calculateOptimizedRoute(RouteRequestObject request) {
+        System.out.println("LAT: " + request.getStartLat());
+        System.out.println("LNG: " + request.getStartLng());
+        System.out.println("DIST: " + request.getDistance());
 
         List<Candidate> list = buildGridAndFetchPoints(request.getStartLat(), request.getStartLng(),
                 request.getDistance());
@@ -87,7 +96,7 @@ public class RouteService {
         System.out.println("\n\n\n\n");
         printAllAsGeoJSON(list);
 
-        return solution;
+        return new OptimizedRoute(solution, fetchOverviewPolyline(solution));
 
     }
 
@@ -212,7 +221,7 @@ public class RouteService {
         return Math.sqrt(dLat * dLat + dLng * dLng) <= radius;
     }
 
-
+    // aaddsf
 
     private List<Candidate> filterRawCenterCandidates(List<Candidate> list) {
         List<Candidate> filtered = new ArrayList<>();
@@ -248,7 +257,7 @@ public class RouteService {
         return new ArrayList<>(candidates.subList(0, targetSize));
     }
 
-
+    // rtrtrttr
 
     private double calculateCandidateReward(double baseScore, Double rating, Integer reviews) {
         double reward = baseScore;
@@ -294,7 +303,7 @@ public class RouteService {
         return null;
     }
 
-
+    // sfdsfsd
 
     private Map<Candidate, List<Candidate>> getKNearestNeighbors(List<Candidate> candidates) {
         Map<Candidate, List<Candidate>> graph = new HashMap<>();
@@ -328,7 +337,7 @@ public class RouteService {
     private double calculateEuclideanDist(Candidate a, Candidate b) {
         // 111,320 מטרים שווים בערך למעלה אחת
         double dLat = (a.getLat() - b.getLat()) * 111320.0;
-        // בקפיצות של קווי אורך צריך להתחשב בקו הרוחב 
+        // בקפיצות של קווי אורך צריך להתחשב בקו הרוחב
         double dLng = (a.getLng() - b.getLng()) * 111320.0 * Math.cos(Math.toRadians(a.getLat()));
 
         return Math.sqrt(dLat * dLat + dLng * dLng);
@@ -341,8 +350,7 @@ public class RouteService {
 
     }
 
-
-
+    /// sgsdsf
 
     private Map<Candidate, Map<Candidate, Double>> fetchRealWalkingDistances(Map<Candidate, List<Candidate>> knnGraph) {
         Map<Candidate, Map<Candidate, Double>> distanceMap = new HashMap<>();
@@ -414,7 +422,7 @@ public class RouteService {
             if ("OK".equals(element.getStatus())) {
                 double distInMeters = element.getDistance().getValue();
 
-                //  שמירת הכיוון המקורי (A -> B) שגוגל הרגע חזר איתו
+                // שמירת הכיוון המקורי (A -> B) שגוגל הרגע חזר איתו
                 distanceMap.get(origin).put(destination, distInMeters);
 
                 distanceMap.get(destination).putIfAbsent(origin, distInMeters);
@@ -436,11 +444,64 @@ public class RouteService {
         ).execute();
     }
 
+    // sdfsdfd
 
+    private String fetchOverviewPolyline(List<Waypoint> waypoints) {
+        if (waypoints == null || waypoints.size() < 2) {
+            return "";
+        }
 
+        // הגדרת נקודת מוצא ויעד
+        Waypoint originWp = waypoints.get(0);
+        String originParam = originWp.getLat() + "," + originWp.getLng();
 
+        Waypoint destWp = waypoints.get(waypoints.size() - 1);
+        String destParam = destWp.getLat() + "," + destWp.getLng();
 
-    public void printCandidates(RouteRequest request) {
+        // בניית שרשרת נקודות הביניים (התחנות של ה-DPSO)
+        String waypointsParam = formatIntermediateWaypoints(waypoints);
+
+        try {
+            // קריאה נקייה - ה-Interceptor של RetrofitConfig מזריק את ה-key וההדרים אוטומטית
+            // מאחורי הקלעים
+            retrofit2.Response<DirectionsResponse> response = directionsClient
+                    .getDirections(originParam, destParam, waypointsParam, "walking")
+                    .execute();
+
+            if (response.isSuccessful() && response.body() != null && "OK".equals(response.body().getStatus())) {
+                List<DirectionsResponse.Route> routes = response.body().getRoutes();
+                if (routes != null && !routes.isEmpty()) {
+                    return routes.get(0).getOverview_polyline().getPoints();
+                }
+            } else {
+                System.out.println("Directions API Error: " + response.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    private String formatIntermediateWaypoints(List<Waypoint> waypoints) {
+        if (waypoints.size() <= 2) {
+            return null; // אין נקודות ביניים (רק התחלה וסוף)
+        }
+
+        StringBuilder sb = new StringBuilder("optimize:false");
+
+        // שרשור נקודות הביניים בלבד (מדלגים על האינדקס הראשון והאחרון)
+        for (int i = 1; i < waypoints.size() - 1; i++) {
+            Waypoint wp = waypoints.get(i);
+            sb.append("|").append(wp.getLat()).append(",").append(wp.getLng());
+        }
+
+        return sb.toString();
+    }
+
+    // ddd
+
+    public void printCandidates(RouteRequestObject request) {
         System.out.println("--- מתחיל חישוב עבור מרחק: " + request.getDistance() + " ---");
         List<Candidate> list = buildGridAndFetchPoints(request.getStartLat(), request.getStartLng(),
                 request.getDistance());

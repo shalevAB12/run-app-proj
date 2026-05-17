@@ -75,4 +75,15 @@ public class RetrofitConfig {
                 .build()
                 .create(GoogleDistanceMatrixClient.class);
     }
+
+// 5. הלקוח של Directions API
+    @Bean
+    public GoogleDirectionsClient googleDirectionsClient(OkHttpClient googleOkHttpClient) {
+        return new Retrofit.Builder()
+                .baseUrl("https://maps.googleapis.com/") // משתמש באותו ה-Base URL של ה-Distance Matrix
+                .addConverterFactory(JacksonConverterFactory.create())
+                .client(googleOkHttpClient) // הזרקת הלקוח המשותף שמטפל בלוגים ובמפתחות
+                .build()
+                .create(GoogleDirectionsClient.class);
+    }
 }

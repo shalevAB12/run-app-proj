@@ -2,20 +2,18 @@ package shaleva.run_app_proj.datamodels;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RouteRequest {
-    @JsonProperty("startLat")
+public class RouteRequestObject {
+    @JsonProperty("latitude")
     private double startLat;
 
-    @JsonProperty("startLng")
+    @JsonProperty("longitude")
     private double startLng;
 
-    @JsonProperty("distance")
+    @JsonProperty("maxLength")
     private double distance; // המרחק המבוקש במטרים או ק"מ
 
-    @JsonProperty("userId")
-    private String userId;
 
-    public RouteRequest(double startLat, double startLng, double distance) {
+    public RouteRequestObject(double startLat, double startLng, double distance) {
         this.startLat = startLat;
         this.startLng = startLng;
         this.distance = distance;
@@ -31,6 +29,4 @@ public class RouteRequest {
     public double getDistance() { return distance; }
     public void setDistance(double distance) { this.distance = distance; }
 
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
 }

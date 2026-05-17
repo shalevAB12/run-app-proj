@@ -16,10 +16,15 @@ public class OptimizedRoute {
     @JsonProperty
     private List<Waypoint> path;
 
+    @JsonProperty
+    private String polyline;
+
     public OptimizedRoute() {}
 
-    public OptimizedRoute(List<Waypoint> path) {
+    public OptimizedRoute(List<Waypoint> path, String polyline) {
         this.path = path;
+        this.polyline = polyline;
+        
         calculateTotalReward();
         calculateTotalDistance();
     }
@@ -34,6 +39,10 @@ public class OptimizedRoute {
 
     public List<Waypoint> getPath() {
         return path;
+    }
+
+    public String getPolyline() {
+        return polyline;
     }
 
     @JsonIgnore

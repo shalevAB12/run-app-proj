@@ -14,7 +14,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
-import shaleva.run_app_proj.datamodels.RouteRequest;
+import shaleva.run_app_proj.datamodels.RouteRequestObject;
 import shaleva.run_app_proj.datamodels.User;
 import shaleva.run_app_proj.datamodels.Waypoint;
 import shaleva.run_app_proj.services.RouteService;

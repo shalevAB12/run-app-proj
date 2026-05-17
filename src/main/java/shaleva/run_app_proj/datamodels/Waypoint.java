@@ -21,6 +21,7 @@ public class Waypoint {
     @JsonProperty("distanceToNext")
     private double distanceToNext;
 
+    public Waypoint() {}
 
     public Waypoint(double lat, double lng, String placeId, double reward, double distanceToNext) {
         this.lat = lat;
