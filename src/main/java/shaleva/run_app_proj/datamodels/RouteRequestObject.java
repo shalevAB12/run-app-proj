@@ -12,11 +12,21 @@ public class RouteRequestObject {
     @JsonProperty("maxLength")
     private double distance; // המרחק המבוקש במטרים או ק"מ
 
+    @JsonProperty("isCircular")
+    private boolean isCircular;
 
-    public RouteRequestObject(double startLat, double startLng, double distance) {
+
+    public boolean isCircular() {
+        return isCircular;
+    }
+
+    public RouteRequestObject() {}
+
+    public RouteRequestObject(double startLat, double startLng, double distance, boolean isCircular) {
         this.startLat = startLat;
         this.startLng = startLng;
         this.distance = distance;
+        this.isCircular = isCircular;
     }
 
     // Getters & Setters (חובה עבור Jackson)

@@ -72,7 +72,7 @@ public class UserView extends VerticalLayout {
         }
 
         try {
-            userService.insertUser(new User(un, pw));
+            userService.insertUser(new User());
             this.usersGrid.setItems(this.userService.getAllUsers());
 
             // insertion has succeed

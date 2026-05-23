@@ -4,13 +4,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import shaleva.run_app_proj.datamodels.User;
 import shaleva.run_app_proj.services.UserService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @CrossOrigin(origins = "*")
 @RestController
+@RequestMapping("/api")
 public class LoginAndSignupController {
     private UserService userService;
 
@@ -18,7 +23,7 @@ public class LoginAndSignupController {
         this.userService = userService;
     }
     
-    @PostMapping("api/login")
+    @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody User user) {
         User isUserExist = userService.getUserFromDB(user);
         if (isUserExist != null) return ResponseEntity.ok(isUserExist);
@@ -26,11 +31,12 @@ public class LoginAndSignupController {
         return ResponseEntity.status(401).build();
     }
 
-    @PostMapping("api/signup")
+    @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody User user) {
         User isUserExist = userService.getUserFromDB(user);
         if (isUserExist == null) {
             try {
+                user.setCreatedAt();
                 userService.insertUser(user);
             } catch (Exception e) {
                 System.out.println(e.getMessage());

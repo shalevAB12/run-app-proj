@@ -14,7 +14,7 @@ public class UserService {
     }
 
     public void insertUser(User user) throws Exception {
-        if (userRepo.existsByUsernameAndPassword(user.getUsername(), user.getPassword()))
+        if (userRepo.existsByEmailAndPassword(user.getEmail(), user.getPassword()))
             throw new Exception("User allready exists");
         userRepo.insert(user);
     }
@@ -28,7 +28,7 @@ public class UserService {
     }
 
     public User getUserFromDB(User user) {
-        User queryResult = userRepo.findByUsernameAndPassword(user.getUsername(), user.getPassword());
+        User queryResult = userRepo.findByEmailAndPassword(user.getEmail(), user.getPassword());
         return queryResult;
     }
 }
