@@ -1,5 +1,6 @@
 package shaleva.run_app_proj.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +13,6 @@ import shaleva.run_app_proj.services.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api")
@@ -22,11 +22,12 @@ public class LoginAndSignupController {
     public LoginAndSignupController(UserService userService) {
         this.userService = userService;
     }
-    
+
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody User user) {
         User isUserExist = userService.getUserFromDB(user);
-        if (isUserExist != null) return ResponseEntity.ok(isUserExist);
+        if (isUserExist != null)
+            return ResponseEntity.ok(isUserExist);
         // user do not found
         return ResponseEntity.status(401).build();
     }
@@ -40,7 +41,7 @@ public class LoginAndSignupController {
                 userService.insertUser(user);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
-                
+
                 // internal server error response
                 return ResponseEntity.status(500).build();
             }
@@ -50,6 +51,15 @@ public class LoginAndSignupController {
 
         return ResponseEntity.status(409).build();
     }
-    
 
+    @GetMapping("/check")
+    public ResponseEntity<Void> checkUserExists(@RequestParam String email) {
+        boolean exists = userService.existsByEmail(email);
+
+        if (exists) {
+            return ResponseEntity.ok().build(); // 200 OK
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
+        }
+    }
 }

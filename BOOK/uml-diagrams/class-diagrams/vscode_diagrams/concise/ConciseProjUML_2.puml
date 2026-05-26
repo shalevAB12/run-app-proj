@@ -1,0 +1,23 @@
+@startuml
+top to bottom direction
+
+class DPSOAlgorithmService
+class DPSORunner
+class SparseGraph
+class Particle
+class Candidate
+class RouteContext
+class RouteService
+class Waypoint
+
+DPSOAlgorithmService ..> Candidate
+DPSORunner *-- SparseGraph
+DPSORunner o-- Particle
+DPSORunner o-- Candidate
+DPSORunner *-- Candidate
+Particle o-- Candidate
+SparseGraph o-- Candidate
+RouteService *-- DPSOAlgorithmService
+RouteService ..> RouteContext
+RouteService ..> Candidate
+@enduml

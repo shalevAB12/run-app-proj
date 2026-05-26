@@ -1,0 +1,16 @@
+@startuml
+class AccountFragment {
+    - tvInitial : TextView
+    - tvName : TextView
+    - tvEmail : TextView
+    - tvWeight : TextView
+    - tvHeight : TextView
+    - tvBirth : TextView
+    - tvJoined : TextView
+    - btnLogout : MaterialButton
+    + AccountFragment()
+    + onCreateView(inflater : LayoutInflater, container : ViewGroup, savedInstanceState : Bundle) : View
+    + onViewCreated(view : View, savedInstanceState : Bundle) : void
+    - populateUserData(user : User) : void
+}
+@enduml

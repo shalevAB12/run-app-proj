@@ -1,0 +1,15 @@
+@startuml
+class UserManager {
+    - {static} PREF_NAME : String
+    - {static} KEY_USER : String
+    - {static} instance : UserManager
+    - sharedPreferences : SharedPreferences
+    - gson : Gson
+    - UserManager(context : Context)
+    + {static} getInstance(context : Context) : UserManager
+    + saveUser(user : User) : void
+    + getCurrentUser() : User
+    + isLoggedIn() : boolean
+    + logoutUser() : void
+}
+@enduml

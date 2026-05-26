@@ -1,0 +1,47 @@
+@startuml
+top to bottom direction
+
+class RouteService
+class RetrofitConfig
+interface GoogleDirectionsClient
+interface GoogleDistanceMatrixClient
+interface GooglePlacesClient
+interface GoogleRoadsClient
+class DirectionsResponse
+class Route
+class OverviewPolyline
+class Leg
+class TextValue
+class DistanceMatrixResponse
+class Row
+class Element
+class Distance
+class PlacesResponse
+class Place
+class Location
+class DisplayName
+class RoadsResponse
+class SnappedPoint
+
+RouteService *-- GooglePlacesClient
+RouteService *-- GoogleRoadsClient
+RouteService *-- GoogleDistanceMatrixClient
+RouteService *-- GoogleDirectionsClient
+RouteService ..> Row
+RetrofitConfig ..> GooglePlacesClient
+RetrofitConfig ..> GoogleRoadsClient
+RetrofitConfig ..> GoogleDistanceMatrixClient
+RetrofitConfig ..> GoogleDirectionsClient
+DirectionsResponse o-- Route
+Route *-- OverviewPolyline
+Route o-- Leg
+Leg *-- TextValue
+DistanceMatrixResponse o-- Row
+Row o-- Element
+Element *-- Distance
+PlacesResponse o-- Place
+Place *-- Location
+Place *-- DisplayName
+RoadsResponse o-- SnappedPoint
+SnappedPoint *-- Location
+@enduml

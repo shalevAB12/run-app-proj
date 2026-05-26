@@ -1,0 +1,8 @@
+@startuml
+class SelectedRunHolder {
+    - {static} selectedSession : RunSession
+    + {static} setData(session : RunSession) : void
+    + {static} getData() : RunSession
+    + {static} clear() : void
+}
+@enduml

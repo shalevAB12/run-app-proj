@@ -1,0 +1,19 @@
+@startuml
+top to bottom direction
+
+class User
+class RunSession
+class RunDataSummary
+class RunDataPoint
+class RunPointsUpdateRequestObject
+class RouteRequestObject
+class OptimizedRoute
+class Waypoint
+enum RunStatus
+
+RunPointsUpdateRequestObject o-- RunDataPoint
+RunSession o-- RunDataPoint
+RunSession *-- RunDataSummary
+RunSession *-- RunStatus
+OptimizedRoute o-- Waypoint
+@enduml

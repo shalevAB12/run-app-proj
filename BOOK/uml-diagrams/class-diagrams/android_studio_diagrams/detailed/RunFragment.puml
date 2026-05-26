@@ -1,0 +1,8 @@
+@startuml
+class RunFragment {
+    - startRunBtn : Button
+    + RunFragment()
+    + onCreate(savedInstanceState : Bundle) : void
+    + onCreateView(inflater : LayoutInflater, container : ViewGroup, savedInstanceState : Bundle) : View
+}
+@enduml

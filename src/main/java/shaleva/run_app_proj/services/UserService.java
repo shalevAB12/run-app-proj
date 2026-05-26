@@ -31,4 +31,9 @@ public class UserService {
         User queryResult = userRepo.findByEmailAndPassword(user.getEmail(), user.getPassword());
         return queryResult;
     }
+
+    public boolean existsByEmail(String email) {
+        User result = userRepo.findByEmail(email);
+        return result != null;
+    }
 }

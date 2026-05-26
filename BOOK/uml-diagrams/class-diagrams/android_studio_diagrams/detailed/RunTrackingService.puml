@@ -1,0 +1,47 @@
+@startuml
+class RunTrackingService {
+    + {static} ACTION_RUN_UPDATE : String
+    - {static} CHANNEL_ID : String
+    - {static} NOTIFICATION_ID : int
+    - {static} BATCH_INTERVAL_MS : int
+    + {static} ACTION_PAUSE : String
+    + {static} ACTION_RESUME : String
+    + {static} ACTION_FINISH_RUN : String
+    - fusedLocationClient : FusedLocationProviderClient
+    - locationCallback : LocationCallback
+    - totalDistanceInMeters : float
+    - lastLocationForDistance : Location
+    - timerHandler : Handler
+    - startTime : long
+    - isRunning : boolean
+    - currentTimerString : String
+    - currentRunId : String
+    - pointBatch : List<RunDataPoint>
+    - networkHandler : Handler
+    - sensorManager : SensorManager
+    - stepSensor : Sensor
+    - currentStepDelta : int
+    - totalPauseTime : long
+    - pauseStartTime : long
+    - isPaused : boolean
+    - pointsAfterResumeCount : int
+    ~ requestsClient : ServerEndpointsAPI
+    + onCreate() : void
+    - registerStepSensor() : void
+    + onStartCommand(intent : Intent, flags : int, startId : int) : int
+    - pauseTracking() : void
+    - resumeTracking() : void
+    - trackLocationUpdates() : void
+    - processNewLocation(location : Location) : void
+    - startNetworkBatching() : void
+    - sendBatchToServer() : void
+    - startTimer() : void
+    - createNotification() : Notification
+    - createNotificationChannel() : void
+    + onDestroy() : void
+    - finishRunAndStopService() : void
+    + onBind(intent : Intent) : IBinder
+    + onAccuracyChanged(sensor : Sensor, i : int) : void
+    + onSensorChanged(sensorEvent : SensorEvent) : void
+}
+@enduml

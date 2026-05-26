@@ -45,7 +45,7 @@ public enum LocationCategory {
     /**
      * סורקת את כל הטיפוסים (גם אלו של החיפוש וגם אלו של הניקוד בלבד)
      */
-    public static double getHighestScore(List<String> googleTypes) {
+    public static double getHighestScore(List<String> googleTypes, List<String> bonusCategories) {
         if (googleTypes == null || googleTypes.isEmpty()) return DEFAULT.baseScore;
         
         double maxScore = DEFAULT.baseScore;
@@ -53,7 +53,8 @@ public enum LocationCategory {
             for (LocationCategory category : values()) {
                 // בודקים גם ב-apiTypes וגם ב-extraTypes
                 if (category.apiTypes.contains(type) || category.extraTypes.contains(type)) {
-                    maxScore = Math.max(maxScore, category.baseScore);
+                    if (bonusCategories.contains(category.name())) {maxScore = Math.max(maxScore, 1.2 * category.baseScore); System.out.println("BONUS!!!");}
+                    else maxScore = Math.max(maxScore, category.baseScore);
                 }
             }
         }

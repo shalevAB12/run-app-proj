@@ -1,0 +1,36 @@
+@startuml
+top to bottom direction
+
+class AppMain
+class LoginAndSignupController
+class RouteController
+class RunStatisticsController
+class RouteService
+class RunStatisticsService
+class UserService
+interface RunSessionRepository
+interface UserRepository
+interface MongoRepository
+class RouteRequestObject
+class RunPointsUpdateRequestObject
+class User
+class RunSession
+class OptimizedRoute
+enum LocationCategory
+
+LoginAndSignupController *-- UserService
+LoginAndSignupController ..> User
+RouteController *-- RouteService
+RouteController ..> RouteRequestObject
+RunStatisticsController *-- RunStatisticsService
+RunStatisticsController ..> RunPointsUpdateRequestObject
+UserRepository --|> MongoRepository
+RunSessionRepository --|> MongoRepository
+UserService *-- UserRepository
+UserService ..> User
+RunStatisticsService *-- RunSessionRepository
+RunStatisticsService ..> RunSession
+RouteService ..> RouteRequestObject
+RouteService ..> OptimizedRoute
+RouteService ..> LocationCategory
+@enduml

@@ -1,0 +1,33 @@
+@startuml
+class RunRecordingActivity {
+    - gMap : GoogleMap
+    - navigationMarker : Marker
+    - arrowIcon : BitmapDescriptor
+    - isInitializedLocation : boolean
+    - polylines : List<Polyline>
+    - currentPathSegment : List<LatLng>
+    - plannedRoute : List<LatLng>
+    - distanceTextView : TextView
+    - timerTextView : TextView
+    - isPaused : boolean
+    - pauseResumeButton : MaterialButton
+    - stopButton : MaterialButton
+    - serverRunId : String
+    + {static} REQUIRED_PERMISSIONS : String[]
+    - requestsClient : ServerEndpointsAPI
+    - runUpdateReceiver : BroadcastReceiver
+    - runFinishedReceiver : BroadcastReceiver
+    # onCreate(savedInstanceState : Bundle) : void
+    # onResume() : void
+    # onPause() : void
+    - togglePauseResume() : void
+    - stopRun() : void
+    + onMapReady(googleMap : GoogleMap) : void
+    - startNewPolylineSegment() : void
+    - startRunService() : void
+    - updateMapUI(location : Location) : void
+    - getBitmapFromVector(vectorResourceId : int) : BitmapDescriptor
+    - drawPlannedRoute() : void
+    - checkPermissionsAndStartService() : void
+}
+@enduml

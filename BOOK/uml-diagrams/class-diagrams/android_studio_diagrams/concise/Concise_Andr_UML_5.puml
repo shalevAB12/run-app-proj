@@ -1,0 +1,21 @@
+@startuml
+top to bottom direction
+
+class Service <<external>>
+interface SensorEventListener <<external>>
+
+class RunTrackingService
+class UserManager
+class SelectedRunHolder
+class UIHelper
+class LoginActivity
+class AccountFragment
+class HistoryFragment
+
+RunTrackingService --|> Service
+RunTrackingService ..|> SensorEventListener
+
+LoginActivity ..> UserManager
+AccountFragment ..> UserManager
+HistoryFragment ..> UserManager
+@enduml

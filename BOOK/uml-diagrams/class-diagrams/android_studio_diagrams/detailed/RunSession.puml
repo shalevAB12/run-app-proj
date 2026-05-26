@@ -1,0 +1,24 @@
+@startuml
+class RunSession {
+    - runId : String
+    - userId : String
+    - status : RunStatus
+    - startTime : long
+    - dataPoints : List<RunDataPoint>
+    - summary : RunDataSummary
+    + RunSession()
+    + RunSession(id : String, userId : String, status : RunStatus, dataPoints : List<RunDataPoint>, summary : RunDataSummary)
+    + getRunId() : String
+    + setRunId(id : String) : void
+    + getUserId() : String
+    + setUserId(userId : String) : void
+    + getStatus() : RunStatus
+    + setStatus(status : RunStatus) : void
+    + getDataPoints() : List<RunDataPoint>
+    + setDataPoints(dataPoints : List<RunDataPoint>) : void
+    + getSummary() : RunDataSummary
+    + setSummary(summary : RunDataSummary) : void
+    + getStartTime() : long
+    + setStartTime(startTime : long) : void
+}
+@enduml

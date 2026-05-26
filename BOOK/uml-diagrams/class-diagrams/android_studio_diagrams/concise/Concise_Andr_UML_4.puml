@@ -1,0 +1,14 @@
+@startuml
+top to bottom direction
+
+interface ServerEndpointsAPI
+class RESTCommunicationHelper
+class RunTrackingService
+class RunRecordingActivity
+class HistoryFragment
+
+RESTCommunicationHelper ..> ServerEndpointsAPI
+RunTrackingService ..> ServerEndpointsAPI
+RunRecordingActivity ..> ServerEndpointsAPI
+HistoryFragment ..> ServerEndpointsAPI
+@enduml

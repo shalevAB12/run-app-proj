@@ -1,0 +1,23 @@
+@startuml
+top to bottom direction
+
+class AppCompatActivity <<external>>
+
+class SplashActivity
+class LoginActivity
+class SignupActivity
+class HomeActivity
+class RouteSetupActivity
+class RunRecordingActivity
+class RunStatisticsActivity
+
+SplashActivity --|> AppCompatActivity
+LoginActivity --|> AppCompatActivity
+SignupActivity --|> AppCompatActivity
+HomeActivity --|> AppCompatActivity
+RouteSetupActivity --|> AppCompatActivity
+RunRecordingActivity --|> AppCompatActivity
+RunStatisticsActivity --|> AppCompatActivity
+
+
+@enduml

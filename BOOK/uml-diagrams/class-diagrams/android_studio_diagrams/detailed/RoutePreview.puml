@@ -1,0 +1,15 @@
+@startuml
+class RoutePreviewFragment {
+    - mMap : GoogleMap
+    - tvDistance : TextView
+    - startRecordingBtn : MaterialButton
+    - mapCard : CardView
+    - mapPolyline : String
+    - decodedPath : List<LatLng>
+    + onCreateView(inflater : LayoutInflater, container : ViewGroup, savedInstanceState : Bundle) : View
+    + onViewCreated(view : View, savedInstanceState : Bundle) : void
+    + onMapReady(googleMap : GoogleMap) : void
+    - drawRouteAndZoom() : void
+    - startRunRecording() : void
+}
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+class RunStatisticsActivity {
+    - elevationChart : LineChart
+    - speedChart : LineChart
+    - tvDistance : TextView
+    - tvTime : TextView
+    - tvPace : TextView
+    - tvCalories : TextView
+    # onCreate(savedInstanceState : Bundle) : void
+    - updateUI(session : RunSession) : void
+    - setupElevationChart(points : List<RunDataPoint>) : void
+    - setupSpeedChart(points : List<RunDataPoint>) : void
+    - styleChart(chart : LineChart, yAxisLabel : String) : void
+    - formatDuration(millis : long) : String
+    - formatPace(pace : double) : String
+    # onDestroy() : void
+}
+@enduml

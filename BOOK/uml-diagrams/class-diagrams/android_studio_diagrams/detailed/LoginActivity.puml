@@ -1,0 +1,11 @@
+@startuml
+class LoginActivity {
+    - loginBtn : MaterialButton
+    - signupPassBtn : MaterialButton
+    - emailETxt : TextInputEditText
+    - passwordETxt : TextInputEditText
+    - titleTxtV : TextView
+    # onCreate(savedInstanceState : Bundle) : void
+    - activateLogin() : void
+}
+@enduml

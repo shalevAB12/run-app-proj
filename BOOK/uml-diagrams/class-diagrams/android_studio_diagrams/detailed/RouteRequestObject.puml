@@ -1,0 +1,15 @@
+@startuml
+class RouteRequestObject {
+    - latitude : double
+    - longitude : double
+    - maxLength : double
+    - isCircular : boolean
+    - selectedCategories : List<String>
+    + RouteRequestObject(latitude : double, longitude : double, maxLength : double, isCircular : boolean, selectedCategories : ArrayList<String>)
+    + getSelectedCategories() : List<String>
+    + isCircular() : boolean
+    + getLatitude() : double
+    + getLongitude() : double
+    + getMaxLength() : double
+}
+@enduml

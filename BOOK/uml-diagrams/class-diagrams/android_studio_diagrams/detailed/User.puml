@@ -1,0 +1,27 @@
+@startuml
+class User {
+    - email : String
+    - username : String
+    - password : String
+    - weightKg : double
+    - heightCm : double
+    - birthDate : long
+    - createdAt : long
+    + User()
+    + User(username : String, email : String, password : String, weightKg : double, heightCm : double, birthDate : long)
+    + getUsername() : String
+    + setUsername(username : String) : void
+    + getEmail() : String
+    + setEmail(email : String) : void
+    + getPassword() : String
+    + setPassword(password : String) : void
+    + getWeightKg() : double
+    + setWeightKg(weightKg : double) : void
+    + getHeightCm() : double
+    + setHeightCm(heightCm : double) : void
+    + getBirthDate() : long
+    + setBirthDate(birthDate : long) : void
+    + getCreatedAt() : long
+    + setCreatedAt(createdAt : long) : void
+}
+@enduml

@@ -1,0 +1,16 @@
+@startuml
+class Waypoint {
+    - lat : double
+    - lng : double
+    - placeId : String
+    - reward : double
+    - distanceToNext : double
+    + Waypoint()
+    + Waypoint(lat : double, lng : double, placeId : String, reward : double, distanceToNext : double)
+    + getLat() : double
+    + getLng() : double
+    + getPlaceId() : String
+    + getReward() : double
+    + getDistanceToNext() : double
+}
+@enduml

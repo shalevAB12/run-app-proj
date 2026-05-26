@@ -1,0 +1,13 @@
+@startuml
+class OptimizedRoute {
+    - totalDistance : double
+    - totalReward : double
+    - path : List<Waypoint>
+    - polyline : String
+    + OptimizedRoute()
+    + getTotalDistance() : double
+    + getTotalReward() : double
+    + getPath() : List<Waypoint>
+    + getPolyline() : String
+}
+@enduml

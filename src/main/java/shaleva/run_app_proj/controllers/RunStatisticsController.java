@@ -45,9 +45,9 @@ public class RunStatisticsController {
     // 3. סיום ריצה - קבלת ה-ID כפרמטר (נראה ככה: /api/runs/finish?runId=123)
     // או לחלופין בתוך אובייקט Body קטן
     @PostMapping("/finish")
-    public ResponseEntity<RunDataSummary> finishRun(@RequestParam String runId, @RequestParam long pauseDurationMillis) {
-        RunDataSummary summary = runService.finalizeRunStatistics(runId, pauseDurationMillis);
-        return ResponseEntity.ok(summary);
+    public ResponseEntity<RunSession> finishRun(@RequestParam String runId, @RequestParam long pauseDurationMillis) {
+        RunSession summarizedRunSession = runService.finalizeRunStatistics(runId, pauseDurationMillis);
+        return ResponseEntity.ok(summarizedRunSession);
     }
 
     @PostMapping("/history")

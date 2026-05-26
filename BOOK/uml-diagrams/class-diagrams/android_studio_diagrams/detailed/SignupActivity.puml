@@ -1,0 +1,16 @@
+@startuml
+class SignupActivity {
+    - signupBtn : MaterialButton
+    - loginPassBtn : MaterialButton
+    - usernameETxt : TextInputEditText
+    - emailETxt : TextInputEditText
+    - passwordETxt : TextInputEditText
+    - weightETxt : TextInputEditText
+    - heightETxt : TextInputEditText
+    - birthDateETxt : TextInputEditText
+    - selectedBirthDateTimestamp : long
+    # onCreate(savedInstanceState : Bundle) : void
+    - showDatePicker() : void
+    - registerUser() : void
+}
+@enduml

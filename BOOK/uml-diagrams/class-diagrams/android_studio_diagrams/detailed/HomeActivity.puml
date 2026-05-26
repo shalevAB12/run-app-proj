@@ -1,0 +1,8 @@
+@startuml
+class HomeActivity {
+    - navbar : BottomNavigationView
+    # onCreate(savedInstanceState : Bundle) : void
+    - getFragmentOfItem(item : MenuItem) : Fragment
+    - switchFragment(fragment : Fragment) : boolean
+}
+@enduml

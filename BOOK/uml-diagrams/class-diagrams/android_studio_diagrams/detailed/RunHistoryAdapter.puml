@@ -1,0 +1,11 @@
+@startuml
+class RunHistoryAdapter {
+    - runs : List<RunSession>
+    + RunHistoryAdapter(runs : List<RunSession>)
+    + onCreateViewHolder(parent : ViewGroup, viewType : int) : RunViewHolder
+    + onBindViewHolder(holder : RunViewHolder, position : int) : void
+    + getItemCount() : int
+    - formatDuration(millis : long) : String
+    - formatPace(pace : double) : String
+}
+@enduml

@@ -1,0 +1,12 @@
+@startuml
+class RunPointsUpdateRequestObject {
+    - runId : String
+    - points : List<RunDataPoint>
+    + RunPointsUpdateRequestObject()
+    + RunPointsUpdateRequestObject(runId : String, points : List<RunDataPoint>)
+    + getRunId() : String
+    + setRunId(runId : String) : void
+    + getPoints() : List<RunDataPoint>
+    + setPoints(points : List<RunDataPoint>) : void
+}
+@enduml

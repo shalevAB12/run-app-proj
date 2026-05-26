@@ -1,0 +1,8 @@
+@startuml
+class SplashActivity {
+    - apiClient : ServerEndpointsAPI
+    # onCreate(savedInstanceState : Bundle) : void
+    - verifyUserWithServer(email : String) : void
+    - navigateToLogin() : void
+}
+@enduml

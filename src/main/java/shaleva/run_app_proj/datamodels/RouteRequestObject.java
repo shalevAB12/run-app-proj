@@ -1,5 +1,8 @@
 package shaleva.run_app_proj.datamodels;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RouteRequestObject {
@@ -10,33 +13,35 @@ public class RouteRequestObject {
     private double startLng;
 
     @JsonProperty("maxLength")
-    private double distance; // המרחק המבוקש במטרים או ק"מ
+    private double distance; 
 
     @JsonProperty("isCircular")
     private boolean isCircular;
 
-
-    public boolean isCircular() {
-        return isCircular;
-    }
+    @JsonProperty("selectedCategories")
+    private List<String> selectedCategories;
 
     public RouteRequestObject() {}
 
-    public RouteRequestObject(double startLat, double startLng, double distance, boolean isCircular) {
+    public RouteRequestObject(double startLat, double startLng, double distance, boolean isCircular, ArrayList<String> selectedCategories) {
         this.startLat = startLat;
         this.startLng = startLng;
         this.distance = distance;
         this.isCircular = isCircular;
     }
 
-    // Getters & Setters (חובה עבור Jackson)
     public double getStartLat() { return startLat; }
-    public void setStartLat(double startLat) { this.startLat = startLat; }
 
     public double getStartLng() { return startLng; }
-    public void setStartLng(double startLng) { this.startLng = startLng; }
 
     public double getDistance() { return distance; }
-    public void setDistance(double distance) { this.distance = distance; }
+
+    public List<String> getSelectedCategories() {
+        return selectedCategories;
+    }
+
+    public boolean isCircular() {
+        return isCircular;
+    }
 
 }

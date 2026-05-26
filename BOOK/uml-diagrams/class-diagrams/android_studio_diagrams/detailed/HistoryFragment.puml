@@ -1,0 +1,13 @@
+@startuml
+class HistoryFragment {
+    - recyclerView : RecyclerView
+    - progressBar : ProgressBar
+    - adapter : RunHistoryAdapter
+    - runList : List<RunSession>
+    - requestsClient : ServerEndpointsAPI
+    + HistoryFragment()
+    + onCreateView(inflater : LayoutInflater, container : ViewGroup, savedInstanceState : Bundle) : View
+    + onViewCreated(view : View, savedInstanceState : Bundle) : void
+    - fetchUserHistory() : void
+}
+@enduml

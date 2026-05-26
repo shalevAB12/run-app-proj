@@ -39,76 +39,67 @@ public class RunStatisticsService {
     /**
      * פונקציה זו נקראת כשהאנדרואיד מדווח על סיום הריצה
      */
-    public RunDataSummary finalizeRunStatistics(String runId, long pauseDurationMillis) {
+    public RunSession finalizeRunStatistics(String runId, long pauseDurationMillis) {
         RunSession session = runRepository.findById(runId)
                 .orElseThrow(() -> new RuntimeException("Run session not found"));
 
         List<RunDataPoint> points = session.getDataPoints();
 
-        if (points == null || points.isEmpty()) {
-            return new RunDataSummary(); // החזרת אובייקט ריק אם אין דגימות
-        }
-
-        double totalDistanceMeters = 0;
-        double totalElevationGain = 0;
-        int totalSteps = 0;
-
-        // מעבר על הנקודות לחישוב מצטבר
-        for (int i = 1; i < points.size(); i++) {
-            RunDataPoint prev = points.get(i - 1);
-            RunDataPoint curr = points.get(i);
-
-            if (curr.isFirstPoint())
-                continue;
-            // 1. חישוב מרחק (רק אם הדיוק סביר)
-            if (curr.getAccuracy() < 20.0) {
-                totalDistanceMeters += calculateDistance(
-                        prev.getLatitude(), prev.getLongitude(),
-                        curr.getLatitude(), curr.getLongitude());
-            }
-
-            // 2. חישוב גובה מצטבר (הוספה רק אם יש עלייה)
-            double elevationDiff = curr.getAltitude() - prev.getAltitude();
-            if (elevationDiff > 0.5) { // Hysteresis: התעלמות מקפיצות קטנות ורעשים
-                totalElevationGain += elevationDiff;
-            }
-
-            // 3. סכימת צעדים
-            totalSteps += curr.getStepDelta();
-        }
-
-        // חישוב זמנים מתוך חותמות הזמן
-        // קבלת זמן הסיום ברגע הלחיצה (עכשיו)
-        long endTime = System.currentTimeMillis();
-
-        // חישוב זמן ברוטו (מרגע שהסשן נוצר בשרת ועד עכשיו)
-        long grossDuration = endTime - session.getStartTime();
-
-        // חישוב זמן נטו (הפחתת ההפסקות שהגיעו מהאנדרואיד)
-        long activeDurationMillis = grossDuration - pauseDurationMillis;
-
-        // מניעת חלוקה באפס
-        double totalDistanceKm = totalDistanceMeters / 1000.0;
-        double averagePace = 0;
-        if (totalDistanceKm > 0) {
-            // קצב ממוצע: דקות לקילומטר
-            double durationMinutes = activeDurationMillis / 60000.0;
-            averagePace = durationMinutes / totalDistanceKm;
-        }
-
-        // יצירת אובייקט הסיכום ושמירתו
         RunDataSummary summary = new RunDataSummary();
-        summary.setTotalDistanceKm(totalDistanceKm);
-        summary.setDurationMillis(activeDurationMillis); // במקום totalDurationMillis
-        summary.setAveragePace(averagePace);
-        summary.setTotalElevationGain(totalElevationGain);
-        summary.setTotalSteps(totalSteps);
+
+        if (points == null || points.isEmpty()) {
+            session.setSummary(summary); 
+        } else {
+            double totalDistanceMeters = 0;
+            double totalElevationGain = 0;
+            int totalSteps = 0;
+
+            for (int i = 1; i < points.size(); i++) {
+                RunDataPoint prev = points.get(i - 1);
+                RunDataPoint curr = points.get(i);
+
+                if (curr.isFirstPoint())
+                    continue;
+                if (curr.getAccuracy() < 20.0) {
+                    totalDistanceMeters += calculateDistance(
+                            prev.getLatitude(), prev.getLongitude(),
+                            curr.getLatitude(), curr.getLongitude());
+                }
+
+                double elevationDiff = curr.getAltitude() - prev.getAltitude();
+                if (elevationDiff > 0.5) { // Hysteresis: התעלמות מקפיצות קטנות ורעשים
+                    totalElevationGain += elevationDiff;
+                }
+
+                totalSteps += curr.getStepDelta();
+            }
+
+            long endTime = System.currentTimeMillis();
+
+            long grossDuration = endTime - session.getStartTime();
+
+            long activeDurationMillis = grossDuration - pauseDurationMillis;
+
+            double totalDistanceKm = totalDistanceMeters / 1000.0;
+            double averagePace = 0;
+            if (totalDistanceKm > 0) {
+                double durationMinutes = activeDurationMillis / 60000.0;
+                averagePace = durationMinutes / totalDistanceKm;
+            }
+
+            
+            summary.setTotalDistanceKm(totalDistanceKm);
+            summary.setDurationMillis(activeDurationMillis); // במקום totalDurationMillis
+            summary.setAveragePace(averagePace);
+            summary.setTotalElevationGain(totalElevationGain);
+            summary.setTotalSteps(totalSteps);
+        }
 
         session.setSummary(summary);
         session.setStatus(RunStatus.FINISHED);
         runRepository.save(session);
 
-        return summary;
+        return session;
     }
 
     /**

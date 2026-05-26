@@ -50,15 +50,9 @@ public class RouteService {
         int cellsAmount;
         int cellsPerAxis;
         double cellSize;
-        double minPtoPDistance;
         int k;
         int iterations;
         int swarmSize;
-
-        // Counters
-        int countPark = 0;
-        int countRoad = 0;
-        int countRaw = 0;
 
         public RouteContext(double maxDist) {
             this.maxLength = maxDist;
@@ -67,7 +61,6 @@ public class RouteService {
             this.cellsAmount = (int) Math.pow(Math.ceil(Math.sqrt(pointsAmount * CELL_AMOUNT_FACTOR)), 2);
             this.cellsPerAxis = (int) Math.sqrt(cellsAmount);
             this.cellSize = (2 * pointsSearchRadius) / cellsPerAxis;
-            this.minPtoPDistance = cellSize / 2;
             this.k = (int) (Math.min(Math.sqrt(pointsAmount) * K_FACTOR, K_LIMIT));
             this.iterations = ITERATIONS_BASE + pointsAmount * 5;
             this.swarmSize = (int) (SWARM_SIZE_BASE + pointsAmount * 1.5);
@@ -82,7 +75,7 @@ public class RouteService {
         // יצירת קונטקסט לריצה הנוכחית
         RouteContext ctx = new RouteContext(request.getDistance());
         
-        List<Candidate> list = buildGridAndFetchPoints(ctx, request.getStartLat(), request.getStartLng());
+        List<Candidate> list = buildGridAndFetchPoints(ctx, request.getStartLat(), request.getStartLng(), request.getSelectedCategories());
         list = filterRawCenterCandidates(list);
         list = pruneToTargetSize(list, ctx.pointsAmount, request.getStartLat(), request.getStartLng());
 
@@ -97,12 +90,12 @@ public class RouteService {
 
         printRoute(solution);
         System.out.println("\n\n\n\n");
-        printAllAsGeoJSON(list);
+        //printAllAsGeoJSON(list);
 
         return new OptimizedRoute(solution, fetchOverviewPolyline(solution));
     }
 
-    private List<Candidate> buildGridAndFetchPoints(RouteContext ctx, double userLat, double userLng) {
+    private List<Candidate> buildGridAndFetchPoints(RouteContext ctx, double userLat, double userLng, List<String> bonusPlaces) {
         List<Candidate> candidates = new ArrayList<>();
 
         double latStep = ctx.cellSize / 111320.0;
@@ -117,20 +110,20 @@ public class RouteService {
                 double cellLng = startLng + (j * lngStep) + (lngStep / 2);
 
                 if (isWithinRadius(userLat, userLng, cellLat, cellLng, ctx.pointsSearchRadius)) {
-                    Candidate bestInCell = fetchBestInCell(cellLat, cellLng, ctx.cellSize / 2);
+                    Candidate bestInCell = fetchBestInCell(cellLat, cellLng, ctx.cellSize / 2, bonusPlaces);
 
                     if (bestInCell != null) {
                         candidates.add(bestInCell);
-                        ctx.countPark++;
+                        // ctx.countPark++;
                     } else {
                         Candidate snappedCandidate = fetchSnappedPoint(cellLat, cellLng, i, j);
                         if (snappedCandidate != null) {
                             candidates.add(snappedCandidate);
-                            if (snappedCandidate.getId().contains("raw_center")) {
-                                ctx.countRaw++;
-                            } else {
-                                ctx.countRoad++;
-                            }
+                            // if (snappedCandidate.getId().contains("raw_center")) {
+                            //     ctx.countRaw++;
+                            // } else {
+                            //     ctx.countRoad++;
+                            // }
                         }
                     }
                 }
@@ -139,7 +132,7 @@ public class RouteService {
         return candidates;
     }
 
-    private Candidate fetchBestInCell(double lat, double lng, double rad) {
+    private Candidate fetchBestInCell(double lat, double lng, double rad, List<String> bonusPlaces) {
         try {
             Map<String, Object> body = Map.of(
                     "maxResultCount", 5,
@@ -152,7 +145,7 @@ public class RouteService {
 
             if (response.isSuccessful() && response.body() != null &&
                     response.body().getPlaces() != null && !response.body().getPlaces().isEmpty()) {
-                return getMaxRewardPlaceCandidate(response.body().getPlaces());
+                return getMaxRewardPlaceCandidate(response.body().getPlaces(), bonusPlaces);
             } else if (!response.isSuccessful()) {
                 System.out.println("Places API Error: " + response.code());
             }
@@ -222,12 +215,12 @@ public class RouteService {
         return reward;
     }
 
-    private Candidate getMaxRewardPlaceCandidate(List<PlacesResponse.Place> places) {
+    private Candidate getMaxRewardPlaceCandidate(List<PlacesResponse.Place> places, List<String> bonusPlaces) {
         PlacesResponse.Place bestPlace = null;
         double maxReward = -1.0;
 
         for (PlacesResponse.Place place : places) {
-            double baseScore = LocationCategory.getHighestScore(place.getTypes());
+            double baseScore = LocationCategory.getHighestScore(place.getTypes(), bonusPlaces);
             double currentReward = calculateCandidateReward(baseScore, place.getRating(), place.getUserRatingCount());
 
             if (currentReward > maxReward) {
@@ -376,18 +369,18 @@ public class RouteService {
         return sb.toString();
     }
 
-    public void printAllAsGeoJSON(List<Candidate> candidates) {
-        System.out.println("--- Copy from here to geojson.io ---");
-        System.out.println("{ \"type\": \"FeatureCollection\", \"features\": [");
-        for (int i = 0; i < candidates.size(); i++) {
-            Candidate c = candidates.get(i);
-            System.out.print(String.format(
-                    "{ \"type\": \"Feature\", \"properties\": { \"id\": \"%s\", \"reward\": %f }, \"geometry\": { \"type\": \"Point\", \"coordinates\": [ %f, %f ] } }",
-                    c.getId(), c.getReward(), c.getLng(), c.getLat()));
-            if (i < candidates.size() - 1) System.out.println(",");
-        }
-        System.out.println("\n] }");
-    }
+    // public void printAllAsGeoJSON(List<Candidate> candidates) {
+    //     System.out.println("--- Copy from here to geojson.io ---");
+    //     System.out.println("{ \"type\": \"FeatureCollection\", \"features\": [");
+    //     for (int i = 0; i < candidates.size(); i++) {
+    //         Candidate c = candidates.get(i);
+    //         System.out.print(String.format(
+    //                 "{ \"type\": \"Feature\", \"properties\": { \"id\": \"%s\", \"reward\": %f }, \"geometry\": { \"type\": \"Point\", \"coordinates\": [ %f, %f ] } }",
+    //                 c.getId(), c.getReward(), c.getLng(), c.getLat()));
+    //         if (i < candidates.size() - 1) System.out.println(",");
+    //     }
+    //     System.out.println("\n] }");
+    // }
 
     public void printRoute(List<Waypoint> result) {
         for (int i = 0; i < result.size(); i++) {

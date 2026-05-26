@@ -1,0 +1,21 @@
+@startuml
+class RouteSetupActivity {
+    - btnStart : MaterialButton
+    - sliderDistance : Slider
+    - switchCustomized : MaterialSwitch
+    - switchCircular : MaterialSwitch
+    - userLocation : LatLng
+    - selectedCategories : ArrayList<String>
+    # onCreate(savedInstanceState : Bundle) : void
+    - getOptimizedRouteFromServer() : void
+    - sendRequestToServer(progressDialog : ProgressDialog) : void
+    - showRoutePreviewOnMap(route : OptimizedRoute) : void
+    - toggleViewHierarchy(viewGroup : ViewGroup, isEnabled : boolean) : void
+    - startRunRecording() : void
+    + setChosenCategories() : void
+    + checkPermissionsAndStartRunAction() : void
+    + onRequestPermissionsResult(requestCode : int, permissions : String[], grantResults : int[], deviceId : int) : void
+    - showSettingsDialog() : void
+    - showPermissionRationaleDialog() : void
+}
+@enduml

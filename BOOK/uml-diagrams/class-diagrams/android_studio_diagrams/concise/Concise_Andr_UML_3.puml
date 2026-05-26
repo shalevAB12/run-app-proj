@@ -1,0 +1,23 @@
+@startuml
+top to bottom direction
+
+interface Serializable <<external>>
+
+class User
+class RunSession
+class RunDataSummary
+class RunDataPoint
+class Waypoint
+class OptimizedRoute
+class RouteRequestObject
+class RunPointsUpdateRequestObject
+enum RunStatus
+
+User ..|> Serializable
+
+RunSession *-- RunStatus
+RunSession *-- RunDataSummary
+RunSession o-- RunDataPoint
+OptimizedRoute o-- Waypoint
+RunPointsUpdateRequestObject o-- RunDataPoint
+@enduml

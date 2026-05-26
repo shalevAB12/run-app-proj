@@ -1,0 +1,5 @@
+@startuml
+class UIHelper {
+    + {static} buildAlertDialog(context : Context, title : String, message : String, isCancelable : boolean) : AlertDialog.Builder
+}
+@enduml

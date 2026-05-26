@@ -1,0 +1,15 @@
+@startuml
+class RunDataSummary {
+    - totalDistanceKm : double
+    - durationMillis : long
+    - averagePace : double
+    - totalElevationGain : double
+    - totalSteps : int
+    + RunDataSummary()
+    + getTotalDistanceKm() : double
+    + getDurationMillis() : long
+    + getAveragePace() : double
+    + getTotalElevationGain() : double
+    + getTotalSteps() : int
+}
+@enduml

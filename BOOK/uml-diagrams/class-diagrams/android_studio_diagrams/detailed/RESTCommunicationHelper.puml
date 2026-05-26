@@ -1,0 +1,6 @@
+@startuml
+class RESTCommunicationHelper {
+    + {static} SERVER_ADDRESS : String
+    + {static} buildServerActionHTTPRequest() : ServerEndpointsAPI
+}
+@enduml

@@ -1,0 +1,16 @@
+@startuml
+class RunViewHolder {
+    ~ mapView : MapView
+    ~ dateTv : TextView
+    ~ distanceTv : TextView
+    ~ timeTv : TextView
+    ~ paceTv : TextView
+    ~ detailsBtn : TextView
+    ~ map : GoogleMap
+    ~ currentPoints : List<RunDataPoint>
+    + RunViewHolder(itemView : View)
+    + bindMap(points : List<RunDataPoint>) : void
+    + onMapReady(googleMap : GoogleMap) : void
+    - updateMap() : void
+}
+@enduml

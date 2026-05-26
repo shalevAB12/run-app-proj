@@ -1,0 +1,30 @@
+@startuml
+top to bottom direction
+
+class Fragment <<external>>
+class BottomSheetDialogFragment <<external>>
+class "RecyclerView.Adapter" as RecyclerViewAdapter <<external>>
+interface OnMapReadyCallback <<external>>
+
+class AccountFragment
+class HistoryFragment
+class RunFragment
+class RoutePreviewFragment
+class RunHistoryAdapter
+class RunViewHolder
+
+AccountFragment --|> Fragment
+HistoryFragment --|> Fragment
+RunFragment --|> Fragment
+RoutePreviewFragment --|> BottomSheetDialogFragment
+
+RunHistoryAdapter --|> RecyclerViewAdapter
+RunViewHolder ..|> OnMapReadyCallback
+RunHistoryAdapter +- RunViewHolder
+
+HomeActivity ..> AccountFragment
+HomeActivity ..> RunFragment
+HomeActivity ..> HistoryFragment
+HistoryFragment *-- RunHistoryAdapter
+RouteSetupActivity ..> RoutePreviewFragment
+@enduml

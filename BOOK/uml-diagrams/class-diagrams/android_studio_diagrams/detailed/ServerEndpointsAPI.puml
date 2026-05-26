@@ -1,0 +1,12 @@
+@startuml
+interface ServerEndpointsAPI {
+    + checkUserExists(email : String) : Call<Void>
+    + login(user : User) : Call<User>
+    + signup(user : User) : Call<String>
+    + generateRoute(requestObject : RouteRequestObject) : Call<OptimizedRoute>
+    + startRun(userId : String) : Call<String>
+    + finishRun(runId : String, pauseDurationMillis : long) : Call<RunSession>
+    + sendDataPoints(requestObject : RunPointsUpdateRequestObject) : Call<Void>
+    + getUserHistory(userId : String) : Call<List<RunSession>>
+}
+@enduml
