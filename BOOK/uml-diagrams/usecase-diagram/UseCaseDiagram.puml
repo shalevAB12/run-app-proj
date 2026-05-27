@@ -1,0 +1,33 @@
+@startuml usecase-diagram
+left to right direction
+actor "User" as guest
+rectangle "Follow-Up Running App" {
+  usecase "Login" as UC_Login
+  usecase "Register" as UC_Register
+  usecase "Logout" as UC_Logout
+  usecase "Start/Pause/Resume/Stop Run" as UC_Running
+  usecase "Generate Route" as UC_Generate_Route
+  usecase "View Run History" as UC_View_Run_History
+  usecase "Show Run Statistics" as UC_Show_Run_Statistics
+  usecase "View User Profile" as UC_View_User_Profile
+
+}
+
+guest --> UC_Login
+guest --> UC_Register
+guest --> UC_Logout
+guest --> UC_Running
+guest --> UC_Generate_Route
+guest --> UC_View_Run_History
+guest --> UC_Show_Run_Statistics
+guest --> UC_View_User_Profile
+
+note right of UC_Login : התחברות למערכת על ידי אימייל וסיסמה
+note right of UC_Register : יצירת משתמש למערכת על ידי הכנסת אימייל, שם משתמש, סיסמה וכו'
+note right of UC_Logout : התנתקות מהמערכת
+note right of UC_Running : התחלה/השהייה/המשך/עצירה של ריצה
+note right of UC_Generate_Route : מציאת מסלול ריצה בהתאם להגבלות והעדפות של המשתמש
+note right of UC_View_Run_History : הצגת היסטורית תיעודי הריצות שהתקיימו ונשמרו
+note right of UC_Show_Run_Statistics : הצגת סטטיסטיקות ופרטי תיעוד הריצה הנבחרת
+note right of UC_View_User_Profile : הצגת נתוני המשתמש - שם, אימייל וכו'
+@enduml

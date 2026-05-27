@@ -1,0 +1,27 @@
+@startuml meow
+actor "משתמש" as user
+participant "אפליקציה" as App
+participant "שרת" as Server
+participant "DB" as DB
+
+' התחלת ריצה
+user -> App : 1. הזנת פרטים ולחיצה על login
+App -> Server : 2. שליחת בקשת אימות המשתמש
+Server -> DB : 3. שליחת בקשת אימות
+
+alt תקלת תקשורת עם השרת
+    App -> user :3.1. שליחת חיווי למשתמש
+end
+
+DB -> Server :4. קבלת אובייקט המשתמש
+Server -> App :5. שליחת האובייקט אל האפליקציה
+App -> user :6. מעבר למסך הבית
+
+
+alt המשתמש לא קיים
+    DB -> Server :4. הודעת שגיאה / אובייקט ריק
+    Server -> App :5. החזרת תגובה שהמשתמש אינו קיים
+    App -> user :6. שליחת חיווי למשתמש
+end
+
+@enduml

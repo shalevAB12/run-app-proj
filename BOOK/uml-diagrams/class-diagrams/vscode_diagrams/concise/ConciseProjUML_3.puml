@@ -27,7 +27,6 @@ RouteService *-- GooglePlacesClient
 RouteService *-- GoogleRoadsClient
 RouteService *-- GoogleDistanceMatrixClient
 RouteService *-- GoogleDirectionsClient
-RouteService ..> Row
 RetrofitConfig ..> GooglePlacesClient
 RetrofitConfig ..> GoogleRoadsClient
 RetrofitConfig ..> GoogleDistanceMatrixClient

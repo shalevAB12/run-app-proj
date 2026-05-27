@@ -1,0 +1,32 @@
+@startuml meow
+actor "משתמש" as user
+participant "אפליקציה" as App
+participant "GPS" as GPS
+participant "שרת" as Server
+participant "Google REST" as GoogleREST
+
+' התחלת ריצה
+user -> App : 1. בחירת פרמטרים ולחיצה על Generate Route
+App -> GPS : 2. בקשת מיקום נוכחי של המשתמש
+GPS -> App : 3. החזרת המיקום
+
+alt מיקום לא זמין
+    GPS --> App : 3.1. הודעת שגיאה
+    App --> user : 3.2. בקשת ניסיון חוזר
+end
+
+App -> Server : 4. בקשה ליצירת מסלול (עם המיקום)
+
+alt תקלת תקשורת עם השרת
+    App -> user :4.1. שליחת חיווי למשתמש
+end
+
+Server -> Server : 5. מאתחל פרמטרים לבניית הקלט
+Server -> GoogleREST : 6. בקשת שירותי Google API
+GoogleREST -> Server : 7. החזרת אובייקטים כתגובה
+Server -> Server : 8. בניית הקלט והפעלת האלגוריתם
+Server -> App : 9. החזרת אובייקט מסלול כתגובה
+App -> user : 10. הצגת המסלול למשתמש
+
+
+@enduml

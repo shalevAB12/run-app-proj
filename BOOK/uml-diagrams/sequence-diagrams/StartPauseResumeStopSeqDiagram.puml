@@ -1,0 +1,60 @@
+@startuml meow
+actor "משתמש" as user
+participant "אפליקציה" as App
+participant "GPS" as GPS
+participant "שרת" as Server
+participant "DB" as DB
+
+' התחלת ריצה
+user -> App : 1. Start Run
+App -> GPS : 2.1. בקשת מיקום נוכחי
+GPS --> App : 2.2. קבלת מיקום נוכחי
+alt מיקום לא זמין
+    GPS --> App : 2.1. הודעת שגיאה
+    App --> user : 2.2. בקשת ניסיון חוזר
+end
+App -> Server : 3. יצירת ריצה חדשה
+Server -> DB : 4.1. שמירת פרטי הריצה
+DB --> Server : 4.2. אישור שמירה
+Server --> App : 5. אישור התחלת ריצה
+App --> user : 6. יצירת מסך תיעוד הריצה
+
+' מדידה ומעקב בזמן הריצה
+loop פעולות אלו  מתבצעות לאורך כל הריצה
+    par
+        App -> App : 7. מדידה (זמן, מרחק ועוד)
+    end
+
+    par
+        App -> Server : 8. העברת נתוני ריצה נוכחיים
+        Server -> DB : 9. שמירת הנתונים
+    end
+
+    par
+        App -> GPS : 10.1. בקשת מיקום נוכחי
+        GPS --> App : 10.2. קבלת מיקום נוכחי
+    end
+
+    par
+        App --> user : 11. הצגת הנתונים על גבי המסך
+    end
+
+    alt
+        App -> App : Pause
+        App -> App : השהיית התהליכים המקביליים (חוץ מה-UI)
+        App -> user : שליחת חיווי
+    end
+    alt
+        App -> App : Resume
+        App -> App : הפעלת התהליכים המקביליים מחדש
+    end
+    alt
+        App -> App : Stop Run
+        App -> App : עצירת התהליכים הפועלים במקביל (חוץ מה-UI)
+        App -> Server : בקשה לעדכון אובייקט הריצה ב-DB
+        Server -> DB : שליחת אובייקט הריצה לעדכון ושמירה
+        Server -> App : קבלת התגובה
+        App -> user : מעבר למסך הצגת הסיכום/סטטיסטיקות
+    end
+end
+@enduml
