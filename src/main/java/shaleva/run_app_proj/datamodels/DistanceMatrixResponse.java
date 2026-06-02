@@ -35,7 +35,7 @@ public class DistanceMatrixResponse {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Distance {
-        private int value; // הערך חוזר במטרים! מושלם בשבילנו
+        private int value;
 
         public int getValue() { return value; }
         public void setValue(int value) { this.value = value; }

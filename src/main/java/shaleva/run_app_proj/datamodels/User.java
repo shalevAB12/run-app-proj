@@ -15,6 +15,24 @@ public class User {
     private double heightCm;
     private long birthDate;
     private long createdAt;
+    private double lastLat;
+    private double lastLon;
+
+    public double getLastLat() {
+        return lastLat;
+    }
+
+    public void setLastLat(double lastLat) {
+        this.lastLat = lastLat;
+    }
+
+    public double getLastLon() {
+        return lastLon;
+    }
+
+    public void setLastLon(double lastLon) {
+        this.lastLon = lastLon;
+    }
 
     // קונסטרקטור ריק (חובה עבור מונגו ו-Jackson)
     public User() {
@@ -39,7 +57,7 @@ public class User {
     public void setEmail(String email) { this.email = email; }
 
     public String getPassword() { return password; }
-    public void setpassword(String password) { this.password = password; }
+    public void setPassword(String password) { this.password = password; }
 
     public double getWeightKg() { return weightKg; }
     public void setWeightKg(double weightKg) { this.weightKg = weightKg; }

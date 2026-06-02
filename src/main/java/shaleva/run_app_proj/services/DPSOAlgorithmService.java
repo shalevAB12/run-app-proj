@@ -91,6 +91,7 @@ public class DPSOAlgorithmService {
                     for (int j = i + 2; j < improved.size() - 1; j++) {
                         double before = graph.getCost(improved.get(i), improved.get(i + 1)) +
                                 graph.getCost(improved.get(j), improved.get(j + 1));
+                                
                         double after = graph.getCost(improved.get(i), improved.get(j)) +
                                 graph.getCost(improved.get(i + 1), improved.get(j + 1));
 
@@ -120,6 +121,7 @@ public class DPSOAlgorithmService {
                 Collections.shuffle(toImprove, rand);
                 toImprove.add(0, startNode);
 
+                // קיצוץ המסלולים הרנדומליים עד שהם מגיעים לאורך חוקי
                 toImprove = projectToFeasible(toImprove);
                 Particle p = new Particle(toImprove, evaluateFitness(toImprove));
                 swarm.add(p);
@@ -179,11 +181,13 @@ public class DPSOAlgorithmService {
             result.add(toImprove.get(0));
             double cost = 0.0;
 
+            // סכימת נקודות עד הגעה למגבלת אורך המסלול
             for (int i = 1; i < toImprove.size(); i++) {
                 Candidate currentValid = result.get(result.size() - 1);
                 Candidate nextAttempt = toImprove.get(i);
                 double edgeCost = graph.getCost(currentValid, nextAttempt);
 
+                // במידה והוגרל מסלול אם חיבור בין 2 נקודות ללא חיבור - דלג על הנקודה ללא חיבור
                 if (edgeCost == Double.POSITIVE_INFINITY)
                     continue;
 
@@ -195,7 +199,8 @@ public class DPSOAlgorithmService {
                     if (cost + edgeCost + returnCost > T_MAX) {
                         break; // אי אפשר להוסיף את הנקודה הזו, חייבים להתחיל לחזור הביתה
                     }
-                } else {
+                }
+                else {
                     // לוגיקה מקורית למסלול קווי (Point-to-Point)
                     if (cost + edgeCost > T_MAX) {
                         break;

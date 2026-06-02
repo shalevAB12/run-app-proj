@@ -40,6 +40,7 @@ public class RouteService {
     private static final int K_LIMIT = 23;
     private static final int ITERATIONS_BASE = 50;
     private static final int SWARM_SIZE_BASE = 75;
+    // מגדיר אילו פרמטרים הבקשה צריכה בתגובה מה-Places API
     private static final String FIELD_MASK = "places.id,places.location,places.displayName,places.rating,places.userRatingCount,places.types";
 
 
@@ -75,16 +76,21 @@ public class RouteService {
         // יצירת קונטקסט לריצה הנוכחית
         RouteContext ctx = new RouteContext(request.getDistance());
         
+        // בניית גריד של נקודות מה-Places או Roads
         List<Candidate> list = buildGridAndFetchPoints(ctx, request.getStartLat(), request.getStartLng(), request.getSelectedCategories());
+        // סינון נקודות שלא נמצאו ב-Api וחזרו כפי שהם
         list = filterRawCenterCandidates(list);
+        // סינון של נקודות עד הגעה למספר הנקודות הרצוי (שחושב בפרמטר)
         list = pruneToTargetSize(list, ctx.pointsAmount, request.getStartLat(), request.getStartLng());
-
+        // סימון הנקודה הראשונה
         Candidate startNode = new Candidate("START", request.getStartLat(), request.getStartLng(), 0);
+        // הוספת הנקודה הראשונה
         list.add(0, startNode);
-
+        // בניית הגרף וקשרי הנקודות לפי מרחק משוער (לא מקשרים כל נקודה לכולם)
         Map<Candidate, List<Candidate>> knnGraph = getKNearestNeighbors(ctx, list, request.isCircular(), startNode);
+        // עבור כל קשת בגרף מוצאים את המרחק המדויק שבו ניתן ללכת מאותה נקודה לשנייה
         Map<Candidate, Map<Candidate, Double>> distanceMap = fetchRealWalkingDistances(knnGraph);
-
+        // שליחת הגרף עבור ערכי הפרמטרים אל אלגוריתם הליבה וקבלת התוצאה
         List<Waypoint> solution = dpsoAlgorithmService.getSolution(ctx.maxLength, ctx.iterations, ctx.swarmSize,
                 list, distanceMap, request.isCircular(), startNode);
 
@@ -98,24 +104,36 @@ public class RouteService {
     private List<Candidate> buildGridAndFetchPoints(RouteContext ctx, double userLat, double userLng, List<String> bonusPlaces) {
         List<Candidate> candidates = new ArrayList<>();
 
+        // בקווי הרוחב המרחקים בין כל 2 קווים שווה
+        // 111320 הוא המרחק בין קו לקו בכל מעלת רוחב של כדור הארץ במטרים
         double latStep = ctx.cellSize / 111320.0;
+
+        // בקווי האורך לעומת זאת אין מרחקים שווים - ככל שמתקרבים לקו המשווה המרחק גדל
+        // בקו המשווה המרחק הוא 111320 והוא המרחק המקסימלי האפשרי בין 2 קווי אורך
+        // מאחר והמרחק בין 2 קווי אורך משתנה בהתאם למעלת הרוחב, מכפילים  בקוסינוס של מעלת הרוחב
         double lngStep = ctx.cellSize / (111320.0 * Math.cos(Math.toRadians(userLat)));
 
+        //מתחילים לבנות את הגריד המדומה מהקודקוד הכי שמאלי-תחתון בגריד
         double startLat = userLat - (ctx.pointsSearchRadius / 111320.0);
         double startLng = userLng - (ctx.pointsSearchRadius / (111320.0 * Math.cos(Math.toRadians(userLat))));
 
+        // מעבר על כל אמצעי התאים
         for (int i = 0; i < ctx.cellsPerAxis; i++) {
             for (int j = 0; j < ctx.cellsPerAxis; j++) {
                 double cellLat = startLat + (i * latStep) + (latStep / 2);
                 double cellLng = startLng + (j * lngStep) + (lngStep / 2);
 
+                // אם מרכז התא נמצא ברדיוס
                 if (isWithinRadius(userLat, userLng, cellLat, cellLng, ctx.pointsSearchRadius)) {
+                    // חפש מיקום אסטרטגי לפי קטגוריות
                     Candidate bestInCell = fetchBestInCell(cellLat, cellLng, ctx.cellSize / 2, bonusPlaces);
 
+                    // אם נמצא מקום אסטרטגי - להוסיף לרשמית הנקודות המועמדות
                     if (bestInCell != null) {
                         candidates.add(bestInCell);
                         // ctx.countPark++;
                     } else {
+                        // אם לא - חפש נקודה על שביל/כביש קרובה למרכז התא
                         Candidate snappedCandidate = fetchSnappedPoint(cellLat, cellLng, i, j);
                         if (snappedCandidate != null) {
                             candidates.add(snappedCandidate);
@@ -134,6 +152,10 @@ public class RouteService {
 
     private Candidate fetchBestInCell(double lat, double lng, double rad, List<String> bonusPlaces) {
         try {
+            // בניית גוף הבקשה:
+            // עד 5 מיקומים אסטרטגיים
+            // אילו קטגוריות
+            // רדיוס חיפוש
             Map<String, Object> body = Map.of(
                     "maxResultCount", 5,
                     "includedTypes", LocationCategory.getGlobalSearchableTypes(),
@@ -141,12 +163,17 @@ public class RouteService {
                             "center", Map.of("latitude", lat, "longitude", lng),
                             "radius", rad)));
 
+            // שליחת הבקשה עם הכותרת המתאימה
             Response<PlacesResponse> response = placesClient.searchNearby(FIELD_MASK, body).execute();
 
             if (response.isSuccessful() && response.body() != null &&
                     response.body().getPlaces() != null && !response.body().getPlaces().isEmpty()) {
+
+                // החזרת מיקום עם הרפס המקסימלי מבין האופציות שהתקבלו בתגובה
                 return getMaxRewardPlaceCandidate(response.body().getPlaces(), bonusPlaces);
-            } else if (!response.isSuccessful()) {
+
+            } 
+            else if (!response.isSuccessful()) {
                 System.out.println("Places API Error: " + response.code());
             }
         } catch (IOException e) {
@@ -158,13 +185,18 @@ public class RouteService {
     private Candidate fetchSnappedPoint(double lat, double lng, int gridI, int gridJ) {
         try {
             String path = lat + "," + lng;
+            // קבלת נקודה על שביל/כביש שקרוב למרכז התא
             Response<RoadsResponse> response = roadsClient.snapToRoads(path, false).execute();
 
             if (response.isSuccessful() && response.body() != null &&
                     response.body().getSnappedPoints() != null && !response.body().getSnappedPoints().isEmpty()) {
+
                 RoadsResponse.SnappedPoint snapped = response.body().getSnappedPoints().get(0);
+                // אם נמצאה נקודה כזו - תכניס את המזהה שלה ואם לא תסמן את הנקודה
                 String id = (snapped.getPlaceId() != null) ? snapped.getPlaceId()
                         : "generic_node_" + gridI + "_" + gridJ;
+
+                // קביעת הפרס עבור הנקודה והחזרת המועמד
                 double streetScore = LocationCategory.STREET.getBaseScore();
                 return new Candidate(id, snapped.getLocation().getLatitude(),
                         snapped.getLocation().getLongitude(), streetScore);
@@ -172,6 +204,7 @@ public class RouteService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // במידה ולא נמצאה הנקודה - תוחזר נקודת המרכז של התא עם סימון raw center
         return new Candidate("raw_center_" + gridI + "_" + gridJ, lat, lng, 0.0);
     }
 
@@ -194,6 +227,8 @@ public class RouteService {
     private List<Candidate> pruneToTargetSize(List<Candidate> candidates, int targetSize, double centerLat, double centerLng) {
         if (candidates.size() <= targetSize) return candidates;
 
+        // בחירת נקודות לסינון מרשימת הנקודות - לפי ערך הפרס בסדר יורד
+        // ואם הם שווים - אז לפי המרחק ממרכז הגריד בסדר עולה
         candidates.sort((c1, c2) -> {
             int rewardCompare = Double.compare(c2.getReward(), c1.getReward());
             if (rewardCompare != 0) return rewardCompare;
@@ -210,6 +245,8 @@ public class RouteService {
         double r = (rating != null) ? rating : 0.0;
         int rev = (reviews != null) ? reviews : 0;
         if (r > 0 && rev > 0) {
+            // חישוב הפרס עבור נקודה לפי פונקציית לוג - גדלה מהר בהתחלה ואחר כך מתאזנת
+            // על מנת שערכי הפרס יהיו פרופורציונלים ולא מוגזמים משלב מסוים
             reward += (r * 2.5 * Math.log(rev + 1));
         }
         return reward;
@@ -243,6 +280,7 @@ public class RouteService {
             List<Candidate> others = new ArrayList<>(candidates);
             others.remove(current);
 
+            // מיון המועמדים לפי מרחק - בסדר עולה
             others.sort((c1, c2) -> {
                 double dist1 = calculateEuclideanDist(current, c1);
                 double dist2 = calculateEuclideanDist(current, c2);
@@ -250,13 +288,15 @@ public class RouteService {
             });
 
             int limit = Math.min(ctx.k, others.size());
+            // לקיחת מספר הנקודות שניתן לקשר שהן הכי קרובות לאותה הנקודה
             List<Candidate> nearestNeighbors = new ArrayList<>(others.subList(0, limit));
 
+            // ובמידה ואנחנו מחפשים מסלול מעגלי - מקשרים גם את הנקודה גם אל נקודת ההתחלה
             if (isCircular && !current.equals(candidates.get(0))) {
-            if (!nearestNeighbors.contains(candidates.get(0))) {
-                nearestNeighbors.add(candidates.get(0));
+                if (!nearestNeighbors.contains(candidates.get(0))) {
+                    nearestNeighbors.add(candidates.get(0));
+                }
             }
-        }
             graph.put(current, nearestNeighbors);
         }
         return graph;
@@ -284,9 +324,11 @@ public class RouteService {
 
             if (destinations.isEmpty()) continue;
 
+            // בניית פורמט גוף הבקשה ל-Distance Matrix
             StringBuilder destParam = buildAPIRequestDestPointsFormat(destinations);
 
             try {
+                // שליחת הבקשה על מצב הליכה - על מנת לקבל מרחק המאפיין דרך שניתן ללכת בה
                 Response<DistanceMatrixResponse> response = distanceMatrixClient.getDistances(
                         formatLocation(origin), destParam.toString(), "walking").execute();
 
@@ -318,6 +360,7 @@ public class RouteService {
 
     private void updateDistanceResultsToMap(Candidate origin, List<Candidate> destinations,
             DistanceMatrixResponse.Row row, Map<Candidate, Map<Candidate, Double>> distanceMap) {
+        
         for (int i = 0; i < destinations.size(); i++) {
             DistanceMatrixResponse.Element element = row.getElements().get(i);
             Candidate destination = destinations.get(i);
@@ -343,6 +386,8 @@ public class RouteService {
         String destParam = destWp.getLat() + "," + destWp.getLng();
         String waypointsParam = formatIntermediateWaypoints(waypoints);
 
+        // שליחת בקשה ל-Directions API על מנת לקלב את המסלול מפורט יותר
+        // כדי שיהיה ניתן לשלוח לצד הלקוח
         try {
             Response<DirectionsResponse> response = directionsClient
                     .getDirections(originParam, destParam, waypointsParam, "walking").execute();

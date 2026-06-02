@@ -62,4 +62,10 @@ public class LoginAndSignupController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
         }
     }
+
+    @PostMapping("/update_user")
+    public ResponseEntity<User> updateUserData(@RequestBody User user) {
+        User updated = userService.updateUserLastLocation(user.getEmail(), user.getLastLat(), user.getLastLon());
+        return ResponseEntity.ok(updated);
+    }
 }

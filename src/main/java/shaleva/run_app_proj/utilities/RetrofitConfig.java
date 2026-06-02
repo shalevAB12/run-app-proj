@@ -18,7 +18,7 @@ public class RetrofitConfig {
 
     // 1. הלקוח המרכזי - עושה את הלוגים ומזריק את המפתח לכולם
     @Bean
-    public OkHttpClient googleOkHttpClient() {
+    OkHttpClient googleOkHttpClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -45,7 +45,7 @@ public class RetrofitConfig {
 
     // 2. הלקוח של Places API
     @Bean
-    public GooglePlacesClient googlePlacesClient(OkHttpClient googleOkHttpClient) {
+    GooglePlacesClient googlePlacesClient(OkHttpClient googleOkHttpClient) {
         return new Retrofit.Builder()
                 .baseUrl("https://places.googleapis.com/")
                 .addConverterFactory(JacksonConverterFactory.create())
@@ -56,7 +56,7 @@ public class RetrofitConfig {
 
     // 3. הלקוח החדש של Roads API
     @Bean
-    public GoogleRoadsClient googleRoadsClient(OkHttpClient googleOkHttpClient) {
+    GoogleRoadsClient googleRoadsClient(OkHttpClient googleOkHttpClient) {
         return new Retrofit.Builder()
                 .baseUrl("https://roads.googleapis.com/")
                 .addConverterFactory(JacksonConverterFactory.create())
@@ -67,7 +67,7 @@ public class RetrofitConfig {
 
     // 4. הלקוח של Distance Matrix API
     @Bean
-    public GoogleDistanceMatrixClient googleDistanceMatrixClient(OkHttpClient googleOkHttpClient) {
+    GoogleDistanceMatrixClient googleDistanceMatrixClient(OkHttpClient googleOkHttpClient) {
         return new Retrofit.Builder()
                 .baseUrl("https://maps.googleapis.com/") // כתובת ה-Base עבור Maps API
                 .addConverterFactory(JacksonConverterFactory.create())
@@ -78,7 +78,7 @@ public class RetrofitConfig {
 
 // 5. הלקוח של Directions API
     @Bean
-    public GoogleDirectionsClient googleDirectionsClient(OkHttpClient googleOkHttpClient) {
+    GoogleDirectionsClient googleDirectionsClient(OkHttpClient googleOkHttpClient) {
         return new Retrofit.Builder()
                 .baseUrl("https://maps.googleapis.com/") // משתמש באותו ה-Base URL של ה-Distance Matrix
                 .addConverterFactory(JacksonConverterFactory.create())

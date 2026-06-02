@@ -13,17 +13,18 @@ import java.util.List;
 @Service
 public class RunStatisticsService {
 
-    // מאגר הנתונים (למשל MongoDB)
     @Autowired
     private RunSessionRepository runRepository;
+
+    @Autowired
+    private UserService userService;
 
     public String startRunSession(String userId) {
         RunSession newSession = new RunSession();
         newSession.setUserId(userId);
         newSession.setStatus(RunStatus.ACTIVE);
-        newSession.setStartTime(System.currentTimeMillis()); // כדאי להוסיף שדה כזה
+        newSession.setStartTime(System.currentTimeMillis());
 
-        // שמירה והחזרת ה-ID שהמונגו ייצר
         RunSession saved = runRepository.insert(newSession);
         return saved.getRunId();
     }
@@ -36,9 +37,6 @@ public class RunStatisticsService {
         runRepository.save(session);
     }
 
-    /**
-     * פונקציה זו נקראת כשהאנדרואיד מדווח על סיום הריצה
-     */
     public RunSession finalizeRunStatistics(String runId, long pauseDurationMillis) {
         RunSession session = runRepository.findById(runId)
                 .orElseThrow(() -> new RuntimeException("Run session not found"));
